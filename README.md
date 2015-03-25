@@ -1,6 +1,8 @@
 # Reproduce MySQL "nested transactions" exception
 This example project shows how to reproduce an exception regarding "nested transactions" in a simple .NET Web API + Entity Framework 6 + MySQL project.
 
+**Update**: the cause of the issue is this bug in MySQL .NET connector: http://bugs.mysql.com/bug.php?id=71502. It can be reproduced without Entity Framework / Web API.
+
 ## Description
 The project uses .NET Web API, Entity Framework 6 with code-first migrations and the MySQL Entity Framework connector. It contains a single entity `Author` with a column `Name` which has a unique constraint. 
 
