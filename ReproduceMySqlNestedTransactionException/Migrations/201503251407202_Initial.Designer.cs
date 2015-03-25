@@ -13,7 +13,7 @@ namespace ReproduceMySqlNestedTransactionException.Migrations
         
         string IMigrationMetadata.Id
         {
-            get { return "201503251150100_Initial"; }
+            get { return "201503251407202_Initial"; }
         }
         
         string IMigrationMetadata.Source
