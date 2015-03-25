@@ -13,7 +13,9 @@ namespace ReproduceMySqlNestedTransactionException.Controllers
         {
             var authorCon = new AuthorsController();
 
-            string uniqueName = "An amazing author " + GetRandomInt();
+            // Generate a unique value for this test session, to be sure that previous test data doesn't cause
+            // conflicts.
+            string uniqueName = "An amazing author " + Guid.NewGuid().ToString();
 
             var author = new Author
             {
@@ -25,14 +27,15 @@ namespace ReproduceMySqlNestedTransactionException.Controllers
 
             // Now send several more POST calls with the same data. These should all result in an exception with
             // 'Duplicate entry'.
-            // The second call gives the correct exception: duplicate values for column "Name" are not allowed.
+            // The second call with the same data gives the correct exception: duplicate values for column "Name" 
+            // are not allowed.
 
-            // A third attempt should give the same results. However on a MySQL 5.6 Windows instance it doesn't: 
+            // Further calls should give the same results. However on a MySQL 5.6 Windows instance it doesn't: 
             // it throws an exception with an inner MySqlException with message "Nested transactions are not 
             // supported."
 
-            // On a different MySQL server (AWS RDS micro instance) the issue occured systematically after 4
-            // attempts.
+            // On a different MySQL server (AWS RDS micro instance) the issue occured systematically at the 6th 
+            // call.
 
             for (int i = 2; i <= 20; i++)
                 PostAndExpectDuplicateException(authorCon, author, i);
@@ -53,16 +56,9 @@ namespace ReproduceMySqlNestedTransactionException.Controllers
             {
                 Assert.IsTrue(ex.InnerException != null
                     && ex.InnerException.InnerException != null
-                    && ex.InnerException.InnerException.Message.Contains("Duplicate entry"), "Exception with 'Duplicate entry' is thrown on call number " + callNumber + ".");
+                    && ex.InnerException.InnerException.Message.Contains(
+                    "Duplicate entry"), "Exception with 'Duplicate entry' is thrown on call number " + callNumber + ".");
             }
-        }
-
-        private static int GetRandomInt()
-        {
-            var rng = System.Security.Cryptography.RandomNumberGenerator.Create();
-            var randomBytes = new byte[8];
-            rng.GetBytes(randomBytes);
-            return BitConverter.ToInt32(randomBytes, 0);
         }
     }
 }
