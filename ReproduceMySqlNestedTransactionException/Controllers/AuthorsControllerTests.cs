@@ -34,7 +34,7 @@ namespace ReproduceMySqlNestedTransactionException.Controllers
             // On a different MySQL server (AWS RDS micro instance) the issue occured systematically after 4
             // attempts.
 
-            for (int i = 2; i < 20; i++)
+            for (int i = 2; i <= 20; i++)
                 PostAndExpectDuplicateException(authorCon, author, i);
         }
 
