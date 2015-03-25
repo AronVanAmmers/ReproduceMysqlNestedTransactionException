@@ -9,23 +9,10 @@ namespace ReproduceMySqlNestedTransactionException.Controllers
     public class AuthorsControllerTests
     {
         [TestMethod]
-        public void Post()
+        public void PostSameAuthor()
         {
             var authorCon = new AuthorsController();
 
-            PostSameAuthor(authorCon.PostAuthor);
-        }
-
-        [TestMethod]
-        public void PostWithTransactionScope()
-        {
-            var authorCon = new AuthorsController();
-
-            PostSameAuthor(authorCon.PostAuthorWithTransactionScope);
-        }
-
-        public void PostSameAuthor(AuthorPostMethod authorPostMethod)
-        {
             // Generate a unique value for this test session, to be sure that previous test data doesn't cause
             // conflicts.
             string uniqueName = "An amazing author " + Guid.NewGuid().ToString();
@@ -36,7 +23,7 @@ namespace ReproduceMySqlNestedTransactionException.Controllers
             };
 
             // Send a POST with this data. This request succeeds.
-            authorPostMethod(author);
+            authorCon.PostAuthor(author);
 
             // Now send several more POST calls with the same data. These should all result in an exception with
             // 'Duplicate entry'.
@@ -51,7 +38,7 @@ namespace ReproduceMySqlNestedTransactionException.Controllers
             // call.
 
             for (int i = 2; i <= 20; i++)
-                PostAndExpectDuplicateException(authorPostMethod, author, i);
+                PostAndExpectDuplicateException(authorCon, author, i);
         }
 
         /// <summary>
@@ -59,11 +46,11 @@ namespace ReproduceMySqlNestedTransactionException.Controllers
         /// </summary>
         /// <param name="authorCon"></param>
         /// <param name="author"></param>
-        private static void PostAndExpectDuplicateException(AuthorPostMethod authorPostMethod, Author author, int callNumber)
+        private static void PostAndExpectDuplicateException(AuthorsController authorCon, Author author, int callNumber)
         {
             try
             {
-                authorPostMethod(author);
+                authorCon.PostAuthor(author);
             }
             catch (Exception ex)
             {
